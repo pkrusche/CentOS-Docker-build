@@ -1,0 +1,27 @@
+FROM centos:6.7
+
+ENV HOME /root
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+
+RUN  yum install -y yum-plugin-ovl wget curl tar gzip bzip2 which perl
+
+RUN  wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+     bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda3
+
+ENV PATH /opt/miniconda3/bin:${PATH}
+
+RUN  yum install -y centos-release-scl && \
+     yum install -y devtoolset-7-gcc devtoolset-7-binutils && \
+     yum install -y devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran && \
+     yum install -y bzip2-devel ncurses-devel zlib-devel xz-devel git
+
+RUN wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && rpm -Uvh epel-release-6-8.noarch.rpm && rm -f epel-release-6-8.noarch.rmp && yum install -y cmake3 && ln -s /usr/bin/cmake3 /usr/bin/cmake
+
+RUN  conda config --add channels bioconda && \
+     conda install -y cython numpy scipy matplotlib pandas pysam nose mock pep8 pylint && \
+     pip install intervaltree
+
+RUN yum upgrade -y && yum update -y && yum clean all
+
+ADD boost-install.tar.gz /opt/
